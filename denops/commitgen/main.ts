@@ -64,7 +64,7 @@ interface CommitgenOptions {
 const inlineDiffTokenLimit = 4096;
 
 async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
-  const model = "gpt-4.1-nano";
+  const model = "gpt-4.1-mini";
 
   function countTokens(text: string): number {
     const enc = encoding_for_model(model);
