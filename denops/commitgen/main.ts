@@ -63,7 +63,7 @@ interface CommitgenOptions {
 const inlineDiffCharacterLimit = 4096;
 
 async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
-  // 1. Get staged diff
+  // Get staged diff
   const diffCmd = new Deno.Command("git", {
     args: ["diff", "--cached"],
     cwd: options.cwd,
@@ -126,7 +126,7 @@ async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
     }
   }
 
-  // 4. Call Responses API with file_search tool
+  // Call Responses API with file_search tool
   const instructions =
     `You are a commit message generator. Given the given diff.txt, output commit message candidates as function calls.\n` +
     "Each commit message MUST represent the COMPLETE of diff.txt by itself. It is not acceptable to mention only part of the change.";
