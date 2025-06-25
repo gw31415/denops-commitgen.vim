@@ -61,7 +61,8 @@ const commitMessagesSchema: (c: number) => JSONSchemaType<CommitMessage[]> = (
 
 interface CommitgenOptions {
   count: number;
-  cwd?: string | URL;
+  cwd: string;
+  model: TiktokenModel & OpenAI.ResponsesModel;
 }
 
 const inlineDiffTokenLimit = 4096;
@@ -69,7 +70,7 @@ const inlineDiffTokenLimit = 4096;
 export async function commitgen(
   options: CommitgenOptions,
 ): Promise<CommitMessage[]> {
-  const model: TiktokenModel & OpenAI.ResponsesModel = "gpt-4.1-mini";
+  const model = options.model;
 
   function countTokens(text: string): number {
     const enc = encoding_for_model(model);
