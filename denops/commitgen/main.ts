@@ -65,7 +65,7 @@ const inlineDiffCharacterLimit = 4096;
 async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
   // Get staged diff
   const diffCmd = new Deno.Command("git", {
-    args: ["diff", "--cached"],
+    args: ["diff", "--cached", "--ignore-all-space"],
     cwd: options.cwd,
     stdout: "piped",
     stderr: "piped",
