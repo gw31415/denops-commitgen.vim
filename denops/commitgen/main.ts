@@ -17,6 +17,11 @@ interface CommitMessage {
     | "revert";
 }
 
+interface Attachments {
+  vectorStoreId: string;
+  fileId: string;
+}
+
 const commitMessagesSchema = ({
   type: "array",
   items: {
@@ -75,38 +80,34 @@ async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
   const openai = new OpenAI({
     apiKey: Deno.env.get("OPENAI_API_KEY"),
   });
-  let vectorStoreId: string | null = null;
+  let attachments: Attachments | null = null;
 
   if (diff.length > inlineDiffCharacterLimit) {
-    let fileId: string;
     try {
       const file = new File([diff], "diff.txt", { type: "text/plain" });
       const uploaded = await openai.files.create({
         file,
         purpose: "user_data",
       });
-      fileId = uploaded.id;
-    } catch (e) {
-      throw new Error(
-        "Failed to upload diff to OpenAI: " +
-          (e instanceof Error ? e.message : String(e)),
-      );
-    }
+      const fileId = uploaded.id;
 
-    try {
       const vectorStore = await openai.vectorStores.create({
         name: "commitgen-diff",
         expires_after: { anchor: "last_active_at", days: 1 },
       });
-      vectorStoreId = vectorStore.id;
-      await openai.vectorStores.files.create(vectorStoreId, {
-        file_id: fileId,
+      const newAttachments: Attachments = {
+        vectorStoreId: vectorStore.id,
+        fileId,
+      };
+      attachments = newAttachments;
+      await openai.vectorStores.files.create(newAttachments.vectorStoreId, {
+        file_id: newAttachments.fileId,
       });
       // Wait for file indexing to complete
       let fileStatus = "";
       for (let i = 0; i < 20; i++) { // up to ~10 seconds
-        const fileList = await openai.vectorStores.files.list(vectorStoreId);
-        const fileEntry = fileList.data.find((f) => f.id === fileId);
+        const fileList = await openai.vectorStores.files.list(newAttachments.vectorStoreId);
+        const fileEntry = fileList.data.find((f) => f.id === newAttachments.fileId);
         fileStatus = fileEntry?.status || "";
         if (fileStatus === "completed") break;
         if (fileStatus === "failed") {
@@ -130,10 +131,10 @@ async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
     `You are a commit message generator. Given the given diff.txt, output commit message candidates as function calls.\n` +
     "Each commit message MUST represent the COMPLETE of diff.txt by itself. It is not acceptable to mention only part of the change.";
 
-  const tools: OpenAI.Responses.Tool[] = vectorStoreId
+  const tools: OpenAI.Responses.Tool[] = attachments
     ? [{
       type: "file_search",
-      vector_store_ids: [vectorStoreId],
+      vector_store_ids: [attachments.vectorStoreId],
     }]
     : [];
   tools.push(
@@ -159,7 +160,7 @@ async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
     instructions,
     input:
       `Please analyze the diff.txt and generate ${options.count} commit message candidates.` +
-      (vectorStoreId ? "" : "\n\n```diff.txt\n" + diff + "\n```"),
+      (attachments ? "" : "\n\n```diff.txt\n" + diff + "\n```"),
     tools,
   });
 
