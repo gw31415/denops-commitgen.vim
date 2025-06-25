@@ -66,6 +66,7 @@ interface CommitgenOptions {
 }
 
 const inlineDiffTokenLimit = 4096;
+const requestDiffSizeLimit = 1024 * 1024; // 1 MB
 
 export async function commitgen(
   options: CommitgenOptions,
@@ -102,6 +103,12 @@ export async function commitgen(
 
   try {
     if (countTokens(diff) > inlineDiffTokenLimit) {
+      const size = new TextEncoder().encode(diff).length;
+      if (size > requestDiffSizeLimit) {
+        throw new Error(
+          `Diff size (${size} bytes) exceeds the limit of ${requestDiffSizeLimit} bytes.`,
+        );
+      }
       try {
         const file = new File([diff], "diff.txt", { type: "text/plain" });
         const uploaded = await openai.files.create({
