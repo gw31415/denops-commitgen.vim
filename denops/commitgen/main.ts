@@ -1,6 +1,6 @@
 import OpenAI from "jsr:@openai/openai";
 import Ajv, { type JSONSchemaType } from "npm:ajv";
-import { encoding_for_model } from "npm:tiktoken";
+import { encoding_for_model, type TiktokenModel } from "npm:tiktoken";
 
 interface CommitMessage {
   commitMsgContent: string;
@@ -64,7 +64,7 @@ interface CommitgenOptions {
 const inlineDiffTokenLimit = 4096;
 
 async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
-  const model = "gpt-4.1-mini";
+  const model: TiktokenModel & OpenAI.ResponsesModel = "gpt-4.1-mini";
 
   function countTokens(text: string): number {
     const enc = encoding_for_model(model);
