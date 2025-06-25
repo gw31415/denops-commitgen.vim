@@ -23,7 +23,9 @@ interface Attachments {
   fileId: string;
 }
 
-const commitMessagesSchema = ({
+const commitMessagesSchema: (c: number) => JSONSchemaType<CommitMessage[]> = (
+  count,
+) => ({
   type: "array",
   items: {
     type: "object",
@@ -54,7 +56,8 @@ const commitMessagesSchema = ({
     required: ["commitMsgContent", "conventionalCommitType"],
     additionalProperties: false,
   },
-}) satisfies JSONSchemaType<CommitMessage[]>;
+  minItems: count,
+});
 
 interface CommitgenOptions {
   count: number;
@@ -163,7 +166,7 @@ async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
         parameters: {
           type: "object",
           properties: {
-            args: commitMessagesSchema,
+            args: commitMessagesSchema(options.count),
           },
           required: ["args"],
           additionalProperties: false,
@@ -190,7 +193,7 @@ async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
 
     // Validate output
     const ajv = new Ajv.default();
-    const validate = ajv.compile(commitMessagesSchema);
+    const validate = ajv.compile(commitMessagesSchema(options.count));
     if (!validate(output)) {
       throw new Error(
         "OpenAI response did not match schema: " +
@@ -198,7 +201,7 @@ async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
       );
     }
 
-    return output;
+    return output.slice(0, options.count);
   } finally {
     if (attachments) {
       try {
