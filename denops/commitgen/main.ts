@@ -1,5 +1,184 @@
-async function commitgen(cwd: string = Deno.cwd()): Promise<string> {
-  throw new Error("This function is not implemented yet.");
+import OpenAI from "jsr:@openai/openai";
+import Ajv, { type JSONSchemaType } from "npm:ajv";
+
+interface CommitMessage {
+  commitMsgContent: string;
+  conventionalCommitType:
+    | "feat"
+    | "fix"
+    | "docs"
+    | "style"
+    | "refactor"
+    | "perf"
+    | "test"
+    | "build"
+    | "ci"
+    | "chore"
+    | "revert";
 }
 
-console.log(commitgen());
+const commitMessagesSchema = ({
+  type: "array",
+  items: {
+    type: "object",
+    properties: {
+      commitMsgContent: {
+        type: "string",
+        description:
+          "Commit message content, without the Conventional Commit type tag.",
+      },
+      conventionalCommitType: {
+        type: "string",
+        description: "One of the Conventional Commit types.",
+        enum: [
+          "feat",
+          "fix",
+          "docs",
+          "style",
+          "refactor",
+          "perf",
+          "test",
+          "build",
+          "ci",
+          "chore",
+          "revert",
+        ],
+      },
+    },
+    required: ["commitMsgContent", "conventionalCommitType"],
+    additionalProperties: false,
+  },
+}) satisfies JSONSchemaType<CommitMessage[]>;
+
+interface CommitgenOptions {
+  count: number;
+  cwd?: string | URL;
+}
+
+const inlineDiffCharacterLimit = 4096;
+
+async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
+  // 1. Get staged diff
+  const diffCmd = new Deno.Command("git", {
+    args: ["diff", "--cached"],
+    cwd: options.cwd,
+    stdout: "piped",
+    stderr: "piped",
+  });
+  const diffProcess = diffCmd.spawn();
+  const { stdout } = await diffProcess.output();
+  const diff = new TextDecoder().decode(stdout);
+  if (!diff.trim()) {
+    throw new Error("No staged changes found.");
+  }
+
+  const openai = new OpenAI({
+    apiKey: Deno.env.get("OPENAI_API_KEY"),
+  });
+  let vectorStoreId: string | null = null;
+
+  if (diff.length > inlineDiffCharacterLimit) {
+    let fileId: string;
+    try {
+      const file = new File([diff], "diff.txt", { type: "text/plain" });
+      const uploaded = await openai.files.create({
+        file,
+        purpose: "user_data",
+      });
+      fileId = uploaded.id;
+    } catch (e) {
+      throw new Error(
+        "Failed to upload diff to OpenAI: " +
+          (e instanceof Error ? e.message : String(e)),
+      );
+    }
+
+    try {
+      const vectorStore = await openai.vectorStores.create({
+        name: "commitgen-diff",
+        expires_after: { anchor: "last_active_at", days: 1 },
+      });
+      vectorStoreId = vectorStore.id;
+      await openai.vectorStores.files.create(vectorStoreId, {
+        file_id: fileId,
+      });
+      // Wait for file indexing to complete
+      let fileStatus = "";
+      for (let i = 0; i < 20; i++) { // up to ~10 seconds
+        const fileList = await openai.vectorStores.files.list(vectorStoreId);
+        const fileEntry = fileList.data.find((f) => f.id === fileId);
+        fileStatus = fileEntry?.status || "";
+        if (fileStatus === "completed") break;
+        if (fileStatus === "failed") {
+          throw new Error("File indexing failed in vector store");
+        }
+        await new Promise((res) => setTimeout(res, 500));
+      }
+      if (fileStatus !== "completed") {
+        throw new Error("File indexing did not complete in time");
+      }
+    } catch (e) {
+      throw new Error(
+        "Failed to create vector store or attach file: " +
+          (e instanceof Error ? e.message : String(e)),
+      );
+    }
+  }
+
+  // 4. Call Responses API with file_search tool
+  const instructions =
+    `You are a commit message generator. Given the given diff.txt, output commit message candidates as function calls.\n` +
+    "Each commit message MUST represent the COMPLETE of diff.txt by itself. It is not acceptable to mention only part of the change.";
+
+  const tools: OpenAI.Responses.Tool[] = vectorStoreId
+    ? [{
+      type: "file_search",
+      vector_store_ids: [vectorStoreId],
+    }]
+    : [];
+  tools.push(
+    {
+      type: "function",
+      name: "propose_commit_message",
+      description:
+        "Propose commit messages for a git diff, separating the conventional commit type and the message content.",
+      parameters: {
+        type: "object",
+        properties: {
+          args: commitMessagesSchema,
+        },
+        required: ["args"],
+        additionalProperties: false,
+      },
+      strict: true,
+    },
+  );
+
+  const response = await openai.responses.create({
+    model: "gpt-4.1-nano",
+    instructions,
+    input:
+      `Please analyze the diff.txt and generate ${options.count} commit message candidates.` +
+      (vectorStoreId ? "" : "\n\n```diff.txt\n" + diff + "\n```"),
+    tools,
+  });
+
+  const outputs = response.output.filter((i) => i.type === "function_call").map(
+    (i) => i.arguments,
+  );
+
+  const output = outputs.flatMap((i) => JSON.parse(i)?.args ?? []);
+
+  // Validate output
+  const ajv = new Ajv.default();
+  const validate = ajv.compile(commitMessagesSchema);
+  if (!validate(output)) {
+    throw new Error(
+      "OpenAI response did not match schema: " +
+        JSON.stringify(validate.errors),
+    );
+  }
+  return output;
+}
+
+console.log(await commitgen({ count: 5 }));
