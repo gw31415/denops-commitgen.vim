@@ -151,7 +151,7 @@ export async function commitgen(
 
     // Call Responses API with file_search tool
     const instructions =
-      `You are a commit message generator. Given the given diff.txt, output commit message candidates as function calls.\n` +
+      `You are a commit message generator. Given the given diff.txt, propose commit message candidates as function calls.\n` +
       "Each commit message MUST represent the COMPLETE of diff.txt by itself. It is not acceptable to mention only part of the change.";
 
     const tools: OpenAI.Responses.Tool[] = attachments
