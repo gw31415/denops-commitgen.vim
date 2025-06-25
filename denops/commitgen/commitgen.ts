@@ -66,7 +66,9 @@ interface CommitgenOptions {
 
 const inlineDiffTokenLimit = 4096;
 
-async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
+export async function commitgen(
+  options: CommitgenOptions,
+): Promise<CommitMessage[]> {
   const model: TiktokenModel & OpenAI.ResponsesModel = "gpt-4.1-mini";
 
   function countTokens(text: string): number {
@@ -217,5 +219,3 @@ async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
     }
   }
 }
-
-console.log(await commitgen({ count: 5 }));
