@@ -1,5 +1,6 @@
 import OpenAI from "jsr:@openai/openai";
 import Ajv, { type JSONSchemaType } from "npm:ajv";
+import { encoding_for_model } from "npm:tiktoken";
 
 interface CommitMessage {
   commitMsgContent: string;
@@ -60,9 +61,20 @@ interface CommitgenOptions {
   cwd?: string | URL;
 }
 
-const inlineDiffCharacterLimit = 4096;
+const inlineDiffTokenLimit = 4096;
 
 async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
+  const model = "gpt-4.1-nano";
+
+  function countTokens(text: string): number {
+    const enc = encoding_for_model(model);
+    try {
+      return enc.encode(text).length;
+    } finally {
+      enc.free();
+    }
+  }
+
   // Get staged diff
   const diffCmd = new Deno.Command("git", {
     args: ["diff", "--cached", "--ignore-all-space"],
@@ -83,7 +95,7 @@ async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
   let attachments: Attachments | null = null;
 
   try {
-    if (diff.length > inlineDiffCharacterLimit) {
+    if (countTokens(diff) > inlineDiffTokenLimit) {
       try {
         const file = new File([diff], "diff.txt", { type: "text/plain" });
         const uploaded = await openai.files.create({
@@ -161,7 +173,7 @@ async function commitgen(options: CommitgenOptions): Promise<CommitMessage[]> {
     );
 
     const response = await openai.responses.create({
-      model: "gpt-4.1-nano",
+      model,
       instructions,
       input:
         `Please analyze the diff.txt and generate ${options.count} commit message candidates.` +
