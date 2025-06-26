@@ -7,11 +7,18 @@
     "jsr:@cross/fs@~0.1.11": "0.1.12",
     "jsr:@cross/runtime@1": "1.1.0",
     "jsr:@cross/utils@*": "0.16.0",
+    "jsr:@cross/utils@0.16": "0.16.0",
+    "jsr:@denops/core@7": "7.0.1",
+    "jsr:@denops/std@*": "7.5.1",
+    "jsr:@gw31415/commitgen@*": "0.1.0",
     "jsr:@openai/openai@*": "5.7.0",
+    "jsr:@openai/openai@^5.7.0": "5.7.0",
     "jsr:@std/path@^1.0.8": "1.1.0",
     "npm:@types/node@*": "22.13.10",
     "npm:ajv@*": "8.17.1",
-    "npm:tiktoken@*": "1.0.21"
+    "npm:ajv@^8.17.1": "8.17.1",
+    "npm:tiktoken@*": "1.0.21",
+    "npm:tiktoken@^1.0.21": "1.0.21"
   },
   "jsr": {
     "@core/unknownutil@4.3.0": {
@@ -43,6 +50,24 @@
       "dependencies": [
         "jsr:@cross/fs",
         "jsr:@cross/runtime"
+      ]
+    },
+    "@denops/core@7.0.1": {
+      "integrity": "ede39eec60de6d5bf0fbc0337d3e420a9689cc48afea8c71752e6c0fb630bde0"
+    },
+    "@denops/std@7.5.1": {
+      "integrity": "ddf3ed8ba0da876584dfa6aa893e88d735db507483788cdb002d7164a8943c3c",
+      "dependencies": [
+        "jsr:@denops/core"
+      ]
+    },
+    "@gw31415/commitgen@0.1.0": {
+      "integrity": "35ba0219b168fc6ccce9702d2dcef4ca5226d4e0511c33d00c0f22f763d52f02",
+      "dependencies": [
+        "jsr:@cross/utils@0.16",
+        "jsr:@openai/openai@^5.7.0",
+        "npm:ajv@^8.17.1",
+        "npm:tiktoken@^1.0.21"
       ]
     },
     "@openai/openai@5.7.0": {

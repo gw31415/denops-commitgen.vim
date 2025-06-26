@@ -1,6 +1,6 @@
 import { isNumber, isString } from "jsr:@core/unknownutil";
 import type { Denops } from "jsr:@denops/std";
-import { commitgen as originCommitgen } from "./commitgen.ts";
+import { commitgen as originCommitgen } from "jsr:@gw31415/commitgen";
 
 export function main(denops: Denops) {
   denops.dispatcher = {
