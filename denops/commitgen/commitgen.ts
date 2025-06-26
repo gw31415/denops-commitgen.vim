@@ -84,7 +84,7 @@ export async function commitgen(
   const { stdout } = await diffProcess.output();
   const diff = new TextDecoder().decode(stdout);
   if (!diff.trim()) {
-    throw new Error("No staged changes found.");
+    throw new Error("No staged changes other than whitespace found. Have you only formatted the code?");
   }
 
   const openai = new OpenAI({
