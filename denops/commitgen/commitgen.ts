@@ -54,6 +54,7 @@ interface CommitgenOptions {
   count: number;
   cwd: string;
   model: TiktokenModel & OpenAI.ResponsesModel;
+  apiKey?: string;
 }
 
 const inlineDiffTokenLimit = 4096;
@@ -88,7 +89,7 @@ export async function commitgen(
   }
 
   const openai = new OpenAI({
-    apiKey: Deno.env.get("OPENAI_API_KEY"),
+    apiKey: options.apiKey,
   });
   let attachments: Attachments | null = null;
 
