@@ -2,20 +2,23 @@ import OpenAI from "jsr:@openai/openai";
 import Ajv, { type JSONSchemaType } from "npm:ajv";
 import { encoding_for_model, type TiktokenModel } from "npm:tiktoken";
 
+const conventionalCommitTypes = [
+  "feat",
+  "fix",
+  "docs",
+  "style",
+  "refactor",
+  "perf",
+  "test",
+  "build",
+  "ci",
+  "chore",
+  "revert",
+] as const;
+
 interface CommitMessage {
   commitMsgContent: string;
-  conventionalCommitType:
-    | "feat"
-    | "fix"
-    | "docs"
-    | "style"
-    | "refactor"
-    | "perf"
-    | "test"
-    | "build"
-    | "ci"
-    | "chore"
-    | "revert";
+  conventionalCommitType: (typeof conventionalCommitTypes)[number];
 }
 
 interface Attachments {
@@ -38,19 +41,7 @@ const commitMessagesSchema: (c: number) => JSONSchemaType<CommitMessage[]> = (
       conventionalCommitType: {
         type: "string",
         description: "One of the Conventional Commit types.",
-        enum: [
-          "feat",
-          "fix",
-          "docs",
-          "style",
-          "refactor",
-          "perf",
-          "test",
-          "build",
-          "ci",
-          "chore",
-          "revert",
-        ],
+        enum: conventionalCommitTypes,
       },
     },
     required: ["commitMsgContent", "conventionalCommitType"],
