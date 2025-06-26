@@ -121,7 +121,7 @@ export async function commitgen(
   }
 
   // Get staged diff
-  const { stdout: diff } = await spawn(
+  const { stdout: diff, code } = await spawn(
     [
       "git",
       "diff",
@@ -130,7 +130,12 @@ export async function commitgen(
     ],
     undefined,
     options.cwd,
-  );
+  ).catch(() => ({ stdout: null, code: 127 } as const));
+  if (code !== 0) {
+    throw new Error(
+      "Execution of git failed. Ensure you have access to git in your PATH and that you are in a git repository.",
+    );
+  }
   if (!diff.trim()) {
     throw new Error(
       "No staged changes other than whitespace found. Have you only formatted the code?",
