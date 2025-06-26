@@ -17,9 +17,29 @@ const conventionalCommitTypes = [
   "revert",
 ] as const;
 
-interface CommitMessage {
+/**
+ * Represents a commit message following the Conventional Commits specification.
+ */
 export interface CommitMessage {
+  /**
+   * The content of the commit message, excluding the Conventional Commit type tag.
+   */
   commitMsgContent: string;
+  /**
+   * The type of the commit, as per Conventional Commits.
+   *
+   * - feat:     A new feature
+   * - fix:      A bug fix
+   * - docs:     Documentation only changes
+   * - style:    Changes that do not affect the meaning of the code (white-space, formatting, etc)
+   * - refactor: A code change that neither fixes a bug nor adds a feature
+   * - perf:     A code change that improves performance
+   * - test:     Adding missing tests or correcting existing tests
+   * - build:    Changes that affect the build system or external dependencies
+   * - ci:       Changes to CI configuration files and scripts
+   * - chore:    Other changes that don't modify src or test files
+   * - revert:   Reverts a previous commit
+   */
   conventionalCommitType: (typeof conventionalCommitTypes)[number];
 }
 
@@ -52,17 +72,40 @@ const commitMessagesSchema: (c: number) => JSONSchemaType<CommitMessage[]> = (
   minItems: count,
 });
 
-interface CommitgenOptions {
+/**
+ * Options for generating commit messages using the commitgen function.
+ */
 export interface CommitgenOptions {
+  /**
+   * The number of commit message candidates to generate.
+   */
   count: number;
+  /**
+   * The current working directory where git commands are executed.
+   */
   cwd: string;
+  /**
+   * The model to use for tokenization and OpenAI responses.
+   */
   model: TiktokenModel & OpenAI.ResponsesModel;
+  /**
+   * Optional API key for OpenAI authentication.
+   */
   apiKey?: string;
 }
 
 const inlineDiffTokenLimit = 4096;
 const requestDiffSizeLimit = 1024 * 1024; // 1 MB
 
+/**
+ * Generates commit message candidates based on the staged git diff using OpenAI's API.
+ * Handles large diffs by uploading them to a vector store if necessary.
+ * Validates the output against a JSON schema and cleans up temporary resources.
+ *
+ * @param {CommitgenOptions} options - The options for commit message generation.
+ * @returns {Promise<CommitMessage[]>} - A promise that resolves to an array of commit message candidates.
+ * @throws {Error} - Throws if there are no staged changes, the diff is too large, or the OpenAI response is invalid.
+ */
 export async function commitgen(
   options: CommitgenOptions,
 ): Promise<CommitMessage[]> {
