@@ -18,6 +18,7 @@ const conventionalCommitTypes = [
 ] as const;
 
 interface CommitMessage {
+export interface CommitMessage {
   commitMsgContent: string;
   conventionalCommitType: (typeof conventionalCommitTypes)[number];
 }
@@ -52,6 +53,7 @@ const commitMessagesSchema: (c: number) => JSONSchemaType<CommitMessage[]> = (
 });
 
 interface CommitgenOptions {
+export interface CommitgenOptions {
   count: number;
   cwd: string;
   model: TiktokenModel & OpenAI.ResponsesModel;
