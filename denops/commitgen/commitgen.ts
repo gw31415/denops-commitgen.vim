@@ -1,6 +1,7 @@
 import OpenAI from "jsr:@openai/openai";
 import Ajv, { type JSONSchemaType } from "npm:ajv";
 import { encoding_for_model, type TiktokenModel } from "npm:tiktoken";
+import { spawn } from "jsr:@cross/utils";
 
 const conventionalCommitTypes = [
   "feat",
@@ -75,17 +76,20 @@ export async function commitgen(
   }
 
   // Get staged diff
-  const diffCmd = new Deno.Command("git", {
-    args: ["diff", "--cached", "--ignore-all-space"],
-    cwd: options.cwd,
-    stdout: "piped",
-    stderr: "piped",
-  });
-  const diffProcess = diffCmd.spawn();
-  const { stdout } = await diffProcess.output();
-  const diff = new TextDecoder().decode(stdout);
+  const { stdout: diff } = await spawn(
+    [
+      "git",
+      "diff",
+      "--cached",
+      "--ignore-all-space",
+    ],
+    undefined,
+    options.cwd,
+  );
   if (!diff.trim()) {
-    throw new Error("No staged changes other than whitespace found. Have you only formatted the code?");
+    throw new Error(
+      "No staged changes other than whitespace found. Have you only formatted the code?",
+    );
   }
 
   const openai = new OpenAI({

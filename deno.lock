@@ -1,14 +1,51 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@cross/deepmerge@1": "1.0.0",
+    "jsr:@cross/env@1": "1.0.3",
+    "jsr:@cross/fs@~0.1.11": "0.1.12",
+    "jsr:@cross/runtime@1": "1.1.0",
+    "jsr:@cross/utils@*": "0.16.0",
     "jsr:@openai/openai@*": "5.7.0",
+    "jsr:@std/path@^1.0.8": "1.1.0",
     "npm:@types/node@*": "22.13.10",
     "npm:ajv@*": "8.17.1",
     "npm:tiktoken@*": "1.0.21"
   },
   "jsr": {
+    "@cross/deepmerge@1.0.0": {
+      "integrity": "1e1318a74e31ba1959b9aa0acae8bd417b806f74ffd25ac07c90e12f83ad6b1d"
+    },
+    "@cross/env@1.0.3": {
+      "integrity": "218d2dd68bec55cf047d1670a8bddc304b9c011a8ad22e647afa916bb796c8b4",
+      "dependencies": [
+        "jsr:@cross/deepmerge",
+        "jsr:@cross/runtime"
+      ]
+    },
+    "@cross/fs@0.1.12": {
+      "integrity": "eaf0bdef57e3db8706e08a9551769b5f34f6153b5b33813d80f176e7fa9c5b68",
+      "dependencies": [
+        "jsr:@cross/env",
+        "jsr:@cross/runtime",
+        "jsr:@std/path"
+      ]
+    },
+    "@cross/runtime@1.1.0": {
+      "integrity": "f35a3b768a9de125277329483b684062ffc9ee86f4449cb8b3d614adcad64ffb"
+    },
+    "@cross/utils@0.16.0": {
+      "integrity": "c6333cafd9be41a04c449655120989b8f3601322f7344db30f9d00eef7bc942f",
+      "dependencies": [
+        "jsr:@cross/fs",
+        "jsr:@cross/runtime"
+      ]
+    },
     "@openai/openai@5.7.0": {
       "integrity": "942cd526065bd020b1166bf299b3c09b4ddc44a4072c15197ca244dd20fc7b50"
+    },
+    "@std/path@1.1.0": {
+      "integrity": "ddc94f8e3c275627281cbc23341df6b8bcc874d70374f75fec2533521e3d6886"
     }
   },
   "npm": {
