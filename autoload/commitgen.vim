@@ -59,6 +59,6 @@ function commitgen#get_async(path, success, failure = v:null) abort
 		  \ 'commitgen',
 		  \ s:create_options(a:path),
 		  \ type(a:success) == v:t_func ? { v -> call(a:success, [v]) } : { _ -> v:null },
-		  \ type(a:failure) == v:t_func ? { e -> call(a:failure, [s:err_tostring(e)]) } : { _ -> v:null },
+		  \ type(a:failure) == v:t_func ? { e -> call(a:failure, [s:err_tostring(e)]) } : { e -> execute('throw string(' .. string(s:err_tostring(e)) .. ')') },
 		  \ )
 endfunction
