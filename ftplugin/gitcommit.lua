@@ -2,6 +2,8 @@ if vim.fn.has 'nvim-0.11' == 0 then
 	return
 end
 
+local bufnr = vim.api.nvim_get_current_buf()
+
 local function get_root_if_gitcommit()
 	if vim.bo.filetype ~= 'gitcommit' or not vim.fn.expand '%:p':match '/%.git/COMMIT_EDITMSG$' then
 		return nil
@@ -18,7 +20,7 @@ if root and not vim.b.commitgen_result then
 	vim.notify('Requesting commit message for ' .. root, vim.log.levels.INFO)
 	vim.fn['commitgen#get_async'](function(v)
 		vim.notify('Commit message reseived', vim.log.levels.INFO)
-		vim.b.commitgen_result = v
+		vim.api.nvim_buf_set_var(bufnr, 'commitgen_result', v)
 	end, function(e)
 		vim.notify('Error: ' .. e, vim.log.levels.ERROR)
 	end, root)
