@@ -27,7 +27,7 @@ if root and not vim.b.commitgen_result then
 		vim.notify('Error: ' .. e, vim.log.levels.ERROR)
 	end)
 
-	vim.keymap.set('n', '<Plug>(commitgen-select)', function()
+	vim.keymap.set('n', '<Plug>(commitgen-paste)', function()
 		if not vim.b.commitgen_result then
 			vim.notify('No commit message available yet.', vim.log.levels.WARN)
 		else
