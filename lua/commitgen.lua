@@ -2,11 +2,6 @@ if vim.fn.has 'nvim-0.11' == 0 then
 	return {}
 end
 
-local function is_buf_var_defined(bufnr, varname)
-	local ok, _ = pcall(vim.api.nvim_buf_get_var, bufnr, varname)
-	return ok
-end
-
 local function get_root()
 	if vim.bo.filetype ~= 'gitcommit' or not vim.fn.expand '%:p':match '/%.git/COMMIT_EDITMSG$' then
 		local dotgit = vim.fs.find('.git', { upward = true, path = vim.fn.expand '%:p' })[1]
@@ -19,6 +14,8 @@ local function get_root()
 	return projroot
 end
 
+local commitmsg_db = {}
+
 return {
 	paste = function(opts)
 		local opts_inner = vim.tbl_deep_extend('keep', opts or {}, {
@@ -29,14 +26,13 @@ return {
 		if not root then
 			return
 		end
-		local bufnr = vim.api.nvim_get_current_buf()
 
-		if opts_inner.renew or not is_buf_var_defined(bufnr, 'commitgen_result') then
+		if opts_inner.renew or commitmsg_db[root] == nil then
 			print('Requesting commit message for ' .. root)
-			vim.api.nvim_buf_set_var(bufnr, 'commitgen_result', vim.fn['commitgen#get'](root))
+			commitmsg_db[root] = vim.fn['commitgen#get'](root)
 		end
 
-		vim.ui.select(vim.api.nvim_buf_get_var(bufnr, 'commitgen_result'), {
+		vim.ui.select(commitmsg_db[root], {
 			prompt = 'Select commit message:',
 			format_item = function(item)
 				---@diagnostic disable-next-line: redundant-parameter
@@ -60,9 +56,8 @@ return {
 		if not root then
 			return
 		end
-		local bufnr = vim.api.nvim_get_current_buf()
 
-		if not opts_inner.renew and is_buf_var_defined(bufnr, 'commitgen_result') then
+		if not opts_inner.renew and commitmsg_db[root] ~= nil then
 			-- Skip
 			return
 		end
@@ -70,10 +65,7 @@ return {
 
 		vim.notify('Requesting commit message for ' .. root, vim.log.levels.INFO)
 		vim.fn['commitgen#get_async'](root, function(v)
-			if vim.api.nvim_buf_is_valid(bufnr) then
-				vim.notify('Commit message reseived', vim.log.levels.INFO)
-				vim.api.nvim_buf_set_var(bufnr, 'commitgen_result', v)
-			end
+			commitmsg_db[root] = v
 		end)
 	end
 }
