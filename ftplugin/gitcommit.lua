@@ -18,12 +18,12 @@ end
 local root = get_root_if_gitcommit()
 if root and not vim.b.commitgen_result then
 	vim.notify('Requesting commit message for ' .. root, vim.log.levels.INFO)
-	vim.fn['commitgen#get_async'](function(v)
+	vim.fn['commitgen#get_async'](root, function(v)
 		vim.notify('Commit message reseived', vim.log.levels.INFO)
 		vim.api.nvim_buf_set_var(bufnr, 'commitgen_result', v)
 	end, function(e)
 		vim.notify('Error: ' .. e, vim.log.levels.ERROR)
-	end, root)
+	end)
 
 	vim.keymap.set('n', '<Plug>(commitgen-select)', function()
 		if not vim.b.commitgen_result then

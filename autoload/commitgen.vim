@@ -35,7 +35,7 @@ function s:create_options(path) abort
 	return [model, projroot, count]
 endfunction
 
-function commitgen#get(path = expand('%:p')) abort
+function commitgen#get(path) abort
 	return denops#request(
 		  \ 'commitgen',
 		  \ 'commitgen',
@@ -43,7 +43,7 @@ function commitgen#get(path = expand('%:p')) abort
 		  \ )
 endfunction
 
-function commitgen#get_async(success, failure = v:null, path = expand('%:p')) abort
+function commitgen#get_async(path, success, failure = v:null) abort
 	call denops#request_async(
 		  \ 'commitgen',
 		  \ 'commitgen',
