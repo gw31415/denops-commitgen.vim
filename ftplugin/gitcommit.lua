@@ -34,7 +34,10 @@ if root and not vim.b.commitgen_result then
 			vim.ui.select(vim.b.commitgen_result, {
 				prompt = 'Select commit message:',
 				format_item = function(item)
-					return item.conventionalCommitType .. ': ' .. item.commitMsgContent
+					---@diagnostic disable-next-line: redundant-parameter
+					return vim.fn.printf('%-10S%s', item.conventionalCommitType .. ':',
+						---@diagnostic disable-next-line: redundant-parameter
+						item.commitMsgContent)
 				end,
 			}, function(item)
 				if item then
