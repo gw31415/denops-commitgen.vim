@@ -27,6 +27,9 @@ function s:create_options(path) abort
 			let projroot = v:null
 		endif
 	endif
+	if type(projroot) != v:t_string || projroot == ''
+		throw 'Not a git repository: ' . a:path
+	endif
 	let model = get(g:, 'commitgen_model', 'gpt-4o')
 	let count = get(g:, 'commitgen_count', 5)
 	return [model, projroot, count]
