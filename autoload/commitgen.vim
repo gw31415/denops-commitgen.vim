@@ -26,12 +26,12 @@ function s:err_tostring(err) abort
 	endif
 endfunction
 
-function commitgen#get_async(path, success, failure = v:null) abort
+function commitgen#get_async(path, success, failure = { e -> execute('throw string(a:e)') }) abort
 	call denops#request_async(
 		  \ 'commitgen',
 		  \ 'commitgen',
 		  \ s:create_options(a:path),
 		  \ type(a:success) == v:t_func ? { v -> call(a:success, [v]) } : { _ -> v:null },
-		  \ type(a:failure) == v:t_func ? { e -> call(a:failure, [s:err_tostring(e)]) } : { e -> execute('throw string(' .. string(s:err_tostring(e)) .. ')') },
+		  \ type(a:failure) == v:t_func ? { e -> call(a:failure, [s:err_tostring(e)]) } : { _ -> v:null },
 		  \ )
 endfunction
