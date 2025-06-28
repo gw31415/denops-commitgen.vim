@@ -30,7 +30,7 @@
     "jsr:@denosaurs/plug@1": "1.0.5",
     "jsr:@denosaurs/plug@1.0.5": "1.0.5",
     "jsr:@gfx/canvas@*": "0.5.8",
-    "jsr:@gw31415/commitgen@*": "0.1.0",
+    "jsr:@gw31415/commitgen@*": "0.1.1",
     "jsr:@lambdalisue/ansi-escape-code@1": "1.0.4",
     "jsr:@lambdalisue/errorutil@1": "1.1.1",
     "jsr:@lambdalisue/errorutil@^1.1.0": "1.1.1",
@@ -277,6 +277,15 @@
     },
     "@gw31415/commitgen@0.1.0": {
       "integrity": "35ba0219b168fc6ccce9702d2dcef4ca5226d4e0511c33d00c0f22f763d52f02",
+      "dependencies": [
+        "jsr:@cross/utils@0.16",
+        "jsr:@openai/openai@^5.7.0",
+        "npm:ajv@^8.17.1",
+        "npm:tiktoken@^1.0.21"
+      ]
+    },
+    "@gw31415/commitgen@0.1.1": {
+      "integrity": "25a335976039e2d21274bea9ccf8d02d10d5a48be37d14e7ae02df2375d0b6a4",
       "dependencies": [
         "jsr:@cross/utils@0.16",
         "jsr:@openai/openai@^5.7.0",
