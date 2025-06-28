@@ -1,7 +1,7 @@
 function s:create_options(path) abort
 	let projroot = commitgen#utils#get_git_root(a:path)
 	if projroot is v:null
-		throw 'Not a git repository: ' . a:path
+		throw a:path . ' is not in a git repository.'
 	endif
 	let model = get(g:, 'commitgen_model', 'gpt-4o')
 	let count = get(g:, 'commitgen_count', 5)
