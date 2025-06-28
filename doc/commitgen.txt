@@ -1,0 +1,106 @@
+*denops-commitgen.txt*   Plugin for AI-powered commit message generation
+
+==============================================================================
+INTRODUCTION                                            *denops-commitgen*
+
+Denops-commitgen.vim is an AI-powered commit message generator for Vim/Neovim
+using Denops and OpenAI models. It helps you generate conventional commit
+messages for your staged Git changes.
+
+Features:
+- Generate conventional commit messages using AI (OpenAI models, e.g., GPT-4o)
+- Supports both Vim and Neovim
+- Async and sync interfaces
+- Customizable model and number of suggestions
+- Lua interface for Neovim users
+
+==============================================================================
+REQUIREMENTS                                            *commitgen-requirements*
+
+- Vim or Neovim
+- denops.vim
+- Deno (v1.34.0 or later recommended)
+- OpenAI API key (if using OpenAI models)
+
+==============================================================================
+INSTALLATION                                            *commitgen-install*
+
+Use your favorite plugin manager. Example with vim-plug:
+
+    Plug 'vim-denops/denops.vim'
+    Plug 'gw31415/denops-commitgen.vim'
+
+Or with lazy.nvim for Neovim:
+
+    {
+      'vim-denops/denops.vim',
+      'gw31415/denops-commitgen.vim',
+    }
+
+==============================================================================
+CONFIGURATION                                           *commitgen-config*
+
+Set the model and number of suggestions globally in your vimrc/init.vim:
+
+    let g:commitgen_model = 'gpt-4o'   " Default: 'gpt-4o'
+    let g:commitgen_count = 5          " Default: 5
+
+==============================================================================
+USAGE                                                   *commitgen-usage*
+
+Vim/Neovim (VimL):
+- Sync: Get commit messages for the current file or path:
+
+    echo commitgen#get('path/to/file')
+
+- Async: Get commit messages asynchronously:
+
+    call commitgen#get_async('path/to/file', {v -> echo v})
+
+Neovim (Lua):
+- The Lua module is available for Neovim 0.11 or later.
+
+    local commitgen = require('commitgen')
+    commitgen.paste({ after = true, renew = false })
+
+==============================================================================
+COMMANDS & FUNCTIONS                                    *commitgen-functions*
+
+VimL:
+    commitgen#get({path}) ~                                        *commitgen-get*
+        Returns a list of commit message suggestions for the given path.
+
+    commitgen#get_async({path}, {success}, {failure}) ~            *commitgen-get-async*
+        Asynchronously gets commit message suggestions.
+
+Lua (Neovim 0.11+):
+    require('commitgen').paste({ after = true, renew = false }) ~  *commitgen-paste*
+        Prompts for a commit message and pastes it into the buffer.
+
+    require('commitgen').request({ renew = false }) ~              *commitgen-request*
+        Requests commit messages and caches them for the current commit hash.
+
+==============================================================================
+CUSTOMIZATION                                           *commitgen-custom*
+
+You can customize the model and number of suggestions using global variables:
+
+    let g:commitgen_model = 'gpt-4o'
+    let g:commitgen_count = 5
+
+==============================================================================
+SEE ALSO                                                *commitgen-seealso*
+
+- https://github.com/gw31415/denops-commitgen.vim
+- https://github.com/vim-denops/denops.vim
+- https://deno.land/
+
+==============================================================================
+AUTHOR                                                  *commitgen-author*
+
+- github.com/gw31415
+
+==============================================================================
+LICENSE                                                 *commitgen-license*
+
+Apache License 2.0. See LICENSE file for details. 
