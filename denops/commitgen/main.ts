@@ -1,6 +1,9 @@
 import { isNumber, isString } from "jsr:@core/unknownutil";
 import type { Denops } from "jsr:@denops/std";
-import { commitgen as originCommitgen } from "jsr:@gw31415/commitgen";
+import {
+  commitgen as originCommitgen,
+  getStagedDiff,
+} from "jsr:@gw31415/commitgen";
 
 export function main(denops: Denops) {
   denops.dispatcher = {
@@ -23,6 +26,12 @@ export function main(denops: Denops) {
         cwd,
         apiKey: apiKey ?? undefined,
       });
+    },
+    getStagedDiff(cwd) {
+      if (!isString(cwd)) {
+        throw new Error("cwd must be a string");
+      }
+      return getStagedDiff(cwd);
     },
   };
 }

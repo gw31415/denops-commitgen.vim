@@ -52,3 +52,13 @@ function commitgen#utils#get_git_root(path = expand('%')) abort
 		return v:shell_error ? v:null : projroot == '' ? v:null : projroot
 	endif
 endfunction
+
+function commitgen#utils#get_current_hash(path = expand('%')) abort
+	let projroot = commitgen#utils#get_git_root(a:path)
+	let data = system('cd ' . shellescape(projroot) . ' && git rev-parse HEAD')
+	let diff = denops#request('commitgen', 'getStagedDiff', [projroot])
+	if !(diff is v:null)
+		let data ..= diff
+	endif
+	return sha256(data)
+endfunction
