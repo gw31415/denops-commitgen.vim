@@ -2,18 +2,6 @@ if vim.fn.has 'nvim-0.11' == 0 then
 	return {}
 end
 
-local function get_root()
-	if vim.bo.filetype ~= 'gitcommit' or not vim.fn.expand '%:p':match '/%.git/COMMIT_EDITMSG$' then
-		local dotgit = vim.fs.find('.git', { upward = true, path = vim.fn.expand '%:p' })[1]
-		return dotgit and vim.fn.fnamemodify(dotgit, ':p:h:h') or nil
-	end
-	local projroot = vim.fn.expand '%:p:h:h'
-	if vim.fn.isdirectory(projroot .. '/.git') == 0 then
-		return nil
-	end
-	return projroot
-end
-
 local commitmsg_db = {}
 
 return {
@@ -22,13 +10,13 @@ return {
 			after = true,
 			renew = false,
 		})
-		local root = get_root()
-		if not root then
+		local root = vim.fn['commitgen#utils#get_git_root']()
+		if root == vim.NIL then
 			return
 		end
 
 		if opts_inner.renew or commitmsg_db[root] == nil then
-			print('Requesting commit message for ' .. root)
+			vim.cmd("echo " .. vim.fn.string('Requesting commit message for ' .. root) .. " | redraw")
 			commitmsg_db[root] = vim.fn['commitgen#get'](root)
 		end
 
@@ -52,8 +40,8 @@ return {
 		local opts_inner = vim.tbl_deep_extend('keep', opts or {}, {
 			renew = false,
 		})
-		local root = get_root()
-		if not root then
+		local root = vim.fn['commitgen#utils#get_git_root']()
+		if root == vim.NIL then
 			return
 		end
 
