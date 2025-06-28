@@ -8,7 +8,7 @@ function commitgen#utils#is_gitcommit(path = expand('%')) abort
 	catch /.*/
 		throw 'Invalid path: ' . a:path
 	endtry
-	return validpath =~ '/\.git/COMMIT_EDITMSG$'
+	return validpath =~ '/\.git/COMMIT_EDITMSG$' && isdirectory(fnamemodify(validpath, ':h'))
 endfunction
 
 function commitgen#utils#get_git_root(path = expand('%')) abort
