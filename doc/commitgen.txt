@@ -45,6 +45,16 @@ Set the model and number of suggestions globally in your vimrc/init.vim:
     let g:commitgen_model = 'gpt-4o'   " Default: 'gpt-4o'
     let g:commitgen_count = 5          " Default: 5
 
+*g:commitgen_model*
+
+    Specifies the OpenAI model to use for generating commit messages.
+    Default is 'gpt-4o'. You can change it to any other supported model.
+
+*g:commitgen_count*
+
+    Specifies the number of commit message suggestions to generate.
+    Default is 5. You can adjust this based on your needs.
+
 ==============================================================================
 USAGE                                                   *commitgen-usage*
 
@@ -64,20 +74,20 @@ Neovim (Lua):
     commitgen.paste({ after = true, renew = false })
 
 ==============================================================================
-COMMANDS & FUNCTIONS                                    *commitgen-functions*
+FUNCTIONS                                               *commitgen-functions*
 
 VimL:
-    commitgen#get({path}) ~                                        *commitgen-get*
+    commitgen#get({path}) ~                                        *commitgen#get()*
         Returns a list of commit message suggestions for the given path.
 
-    commitgen#get_async({path}, {success}, {failure}) ~            *commitgen-get-async*
+    commitgen#get_async({path}, {success}, {failure}) ~            *commitgen#get_async()*
         Asynchronously gets commit message suggestions.
 
 Lua (Neovim 0.11+):
-    require('commitgen').paste({ after = true, renew = false }) ~  *commitgen-paste*
+    require('commitgen').paste({ after = true, renew = false }) ~  *commitgen.paste()*
         Prompts for a commit message and pastes it into the buffer.
 
-    require('commitgen').request({ renew = false }) ~              *commitgen-request*
+    require('commitgen').request({ renew = false }) ~              *commitgen.request()*
         Requests commit messages and caches them for the current commit hash.
 
 ==============================================================================
@@ -104,3 +114,6 @@ AUTHOR                                                  *commitgen-author*
 LICENSE                                                 *commitgen-license*
 
 Apache License 2.0. See LICENSE file for details. 
+
+===============================================================================
+vim:tw=100:ts=8:ft=help:norl:

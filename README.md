@@ -70,4 +70,4 @@ commitgen.request({ renew = true })
 - `request`: Pre-fetches commit messages for the current staged changes.
 
 ## License
-See [LICENSE](./LICENSE). 
+Apache License 2.0. See [LICENSE](./LICENSE). 
