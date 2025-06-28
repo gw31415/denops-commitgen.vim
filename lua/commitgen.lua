@@ -2,6 +2,7 @@ if vim.fn.has 'nvim-0.11' == 0 then
 	return {}
 end
 
+-- TODO: the commitmsg_db will become bloated
 local commitmsg_db = {}
 
 return {
@@ -14,13 +15,14 @@ return {
 		if root == vim.NIL then
 			return
 		end
+		local hash = vim.fn['commitgen#utils#get_current_hash']()
 
-		if opts_inner.renew or commitmsg_db[root] == nil then
+		if opts_inner.renew or commitmsg_db[hash] == nil then
 			vim.cmd("echo " .. vim.fn.string('Requesting commit message for ' .. root) .. " | redraw")
-			commitmsg_db[root] = vim.fn['commitgen#get'](root)
+			commitmsg_db[hash] = vim.fn['commitgen#get'](root)
 		end
 
-		vim.ui.select(commitmsg_db[root], {
+		vim.ui.select(commitmsg_db[hash], {
 			prompt = 'Select commit message:',
 			format_item = function(item)
 				---@diagnostic disable-next-line: redundant-parameter
@@ -44,8 +46,9 @@ return {
 		if root == vim.NIL then
 			return
 		end
+		local hash = vim.fn['commitgen#utils#get_current_hash']()
 
-		if not opts_inner.renew and commitmsg_db[root] ~= nil then
+		if not opts_inner.renew and commitmsg_db[hash] ~= nil then
 			-- Skip
 			return
 		end
@@ -53,7 +56,7 @@ return {
 
 		vim.notify('Requesting commit message for ' .. root, vim.log.levels.INFO)
 		vim.fn['commitgen#get_async'](root, function(v)
-			commitmsg_db[root] = v
+			commitmsg_db[hash] = v
 		end)
 	end
 }
