@@ -2,8 +2,13 @@ if vim.fn.has 'nvim-0.11' == 0 then
 	return {}
 end
 
--- TODO: the commitmsg_db will become bloated
 local commitmsg_db = {}
+--[[
+	{
+		['{GIT ROOTDIR}']{ hash = '{current_hash}', body = {...} },
+		['{GIT ROOTDIR}']{ hash = '{current_hash}', body = {...} },
+	}
+]]
 
 return {
 	paste = function(opts)
@@ -17,16 +22,17 @@ return {
 		end
 		local hash = vim.fn['commitgen#utils#get_current_hash']()
 
-		if opts_inner.renew or commitmsg_db[hash] == nil then
-			vim.cmd("echo " .. vim.fn.string('Requesting commit message for ' .. root) .. " | redraw")
-			commitmsg_db[hash] = vim.fn['commitgen#get'](root)
+		if opts_inner.renew or (commitmsg_db[root] and commitmsg_db[root].hash) ~= hash then
+			vim.cmd('echo ' .. vim.fn.string('Requesting commit message for ' .. root) .. ' | redraw')
+			commitmsg_db[root] = { hash = hash, body = vim.fn['commitgen#get'](root) }
 		end
 
-		vim.ui.select(commitmsg_db[hash], {
+		vim.ui.select(commitmsg_db[root].body, {
 			prompt = 'Select commit message:',
 			format_item = function(item)
 				---@diagnostic disable-next-line: redundant-parameter
-				return vim.fn.printf('%-10S%s', item.conventionalCommitType .. ':', item.commitMsgContent)
+				return vim.fn.printf('%-10S%s', item.conventionalCommitType .. ':', item
+					.commitMsgContent)
 			end,
 		}, function(item)
 			if item then
@@ -48,7 +54,7 @@ return {
 		end
 		local hash = vim.fn['commitgen#utils#get_current_hash']()
 
-		if not opts_inner.renew and commitmsg_db[hash] ~= nil then
+		if not opts_inner.renew and (commitmsg_db[root] and commitmsg_db[root].hash) ~= hash then
 			-- Skip
 			return
 		end
@@ -56,7 +62,7 @@ return {
 
 		vim.notify('Requesting commit message for ' .. root, vim.log.levels.INFO)
 		vim.fn['commitgen#get_async'](root, function(v)
-			commitmsg_db[hash] = v
+			commitmsg_db[root] = { hash = hash, body = v }
 		end)
 	end
 }
