@@ -2,6 +2,8 @@
   "version": "5",
   "specifiers": {
     "jsr:@core/asyncutil@1.2": "1.2.0",
+    "jsr:@core/errorutil@^1.2.1": "1.2.1",
+    "jsr:@core/streamutil@1": "1.0.0",
     "jsr:@core/unknownutil@*": "4.3.0",
     "jsr:@core/unknownutil@4": "4.3.0",
     "jsr:@core/unknownutil@4.3": "4.3.0",
@@ -30,7 +32,7 @@
     "jsr:@denosaurs/plug@1": "1.0.5",
     "jsr:@denosaurs/plug@1.0.5": "1.0.5",
     "jsr:@gfx/canvas@*": "0.5.8",
-    "jsr:@gw31415/commitgen@*": "0.1.1",
+    "jsr:@gw31415/commitgen@*": "0.1.2",
     "jsr:@lambdalisue/ansi-escape-code@1": "1.0.4",
     "jsr:@lambdalisue/errorutil@1": "1.1.1",
     "jsr:@lambdalisue/errorutil@^1.1.0": "1.1.1",
@@ -41,6 +43,7 @@
     "jsr:@lambdalisue/itertools@^1.1.2": "1.1.2",
     "jsr:@lambdalisue/messagepack-rpc@^2.1.1": "2.4.1",
     "jsr:@lambdalisue/messagepack-rpc@^2.4.0": "2.4.1",
+    "jsr:@lambdalisue/messagepack-rpc@^2.4.1": "2.4.1",
     "jsr:@lambdalisue/messagepack@^1.0.2": "1.0.2",
     "jsr:@lambdalisue/reservator@^1.0.1": "1.0.1",
     "jsr:@lambdalisue/sandbox@2": "2.0.1",
@@ -132,6 +135,18 @@
   "jsr": {
     "@core/asyncutil@1.2.0": {
       "integrity": "9967f15190c60df032c13f72ce5ac73d185c34f31c53dc918d8800025854c118"
+    },
+    "@core/errorutil@1.2.1": {
+      "integrity": "4c9efee56ebc403be3b0839093443a695b92bec06223b18147d51c185d4857e6",
+      "dependencies": [
+        "jsr:@core/unknownutil@4"
+      ]
+    },
+    "@core/streamutil@1.0.0": {
+      "integrity": "c26ab1647480b6d721800302969cca2b1812c25795a90f16b74b1b6074c9b15b",
+      "dependencies": [
+        "jsr:@std/bytes@1"
+      ]
     },
     "@core/unknownutil@3.18.1": {
       "integrity": "6aaa108b623ff971d062dd345da7ca03b97f61ae3d29c8677bff14fec11f0d76"
@@ -286,6 +301,15 @@
     },
     "@gw31415/commitgen@0.1.1": {
       "integrity": "25a335976039e2d21274bea9ccf8d02d10d5a48be37d14e7ae02df2375d0b6a4",
+      "dependencies": [
+        "jsr:@cross/utils@0.16",
+        "jsr:@openai/openai@^5.7.0",
+        "npm:ajv@^8.17.1",
+        "npm:tiktoken@^1.0.21"
+      ]
+    },
+    "@gw31415/commitgen@0.1.2": {
+      "integrity": "ac483c41ac8a684503951d0e2ebc35fd23673af5d65a0dba1bbdcf82901b04d7",
       "dependencies": [
         "jsr:@cross/utils@0.16",
         "jsr:@openai/openai@^5.7.0",
