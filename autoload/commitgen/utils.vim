@@ -54,6 +54,10 @@ function commitgen#utils#get_git_root(path = expand('%')) abort
 endfunction
 
 function commitgen#utils#get_current_hash(path = expand('%')) abort
+	if denops#plugin#wait('commitgen') != 0
+		throw 'commitgen plugin is not ready.'
+	endif
+
 	let projroot = commitgen#utils#get_git_root(a:path)
 	let data = system('cd ' . shellescape(projroot) . ' && git rev-parse HEAD')
 	let diff = denops#request('commitgen', 'getStagedDiff', [projroot])

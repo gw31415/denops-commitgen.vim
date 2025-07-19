@@ -9,6 +9,10 @@ function s:create_options(path) abort
 endfunction
 
 function commitgen#get(path) abort
+	if denops#plugin#wait('commitgen') != 0
+		throw 'commitgen plugin is not ready.'
+	endif
+
 	return denops#request(
 		  \ 'commitgen',
 		  \ 'commitgen',
