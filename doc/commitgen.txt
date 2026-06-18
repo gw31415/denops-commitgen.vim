@@ -11,6 +11,8 @@ Supports any OpenAI-compatible API endpoint, including OpenRouter.
 
 Features:
 - Generate conventional commit messages using AI
+- Map-Reduce architecture for large diffs (no vector store required)
+- Real-time progress reporting
 - Supports both Vim and Neovim
 - Async and sync interfaces
 - Customizable model, API key, base URL, and number of suggestions
@@ -69,7 +71,20 @@ Set the model and number of suggestions globally in your vimrc/init.vim:
     Completions API is used instead of OpenAI's Responses API, enabling
     support for providers like OpenRouter.
     Example: 'https://openrouter.ai/api/v1'
-    Default: unset (uses OpenAI's official endpoint with Responses API)
+    Default: unset (uses OpenAI's official endpoint)
+
+HOW IT WORKS                                           *commitgen-how*
+
+For small diffs (≤ ~48 KB), the full diff is sent inline in a single API
+request.
+
+For large diffs, a Map-Reduce strategy is used:
+1. Map: The diff is split into chunks by file boundary. Each chunk is
+   summarized individually.
+2. Reduce: All summaries are combined and sent to the model to generate
+   the final commit message candidates.
+
+Progress is reported via |:messages| during generation.
 
 OPENROUTER EXAMPLE                               *commitgen-openrouter*
 

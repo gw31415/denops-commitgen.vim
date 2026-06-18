@@ -9,6 +9,8 @@ Supports any OpenAI-compatible API endpoint, including [OpenRouter](https://open
 
 ## Features
 - Generate conventional commit messages for your staged Git changes using AI
+- **Map-Reduce** architecture for large diffs: chunks are summarized individually then synthesized — no vector store required
+- Real-time progress reporting via `:messages`
 - Supports both Vim and Neovim
 - Async and sync interfaces
 - Customizable model, API key, base URL, and number of suggestions
@@ -61,7 +63,17 @@ let g:commitgen_api_key = 'sk-or-...'  " or export OPENAI_API_KEY
 | `g:commitgen_model` | `'gpt-4o'` | Model name. Use `provider/model` format for OpenRouter (e.g. `anthropic/claude-sonnet-4`). |
 | `g:commitgen_count` | `5` | Number of commit message candidates to generate. |
 | `g:commitgen_api_key` | _(unset)_ | API key. If unset, the `OPENAI_API_KEY` environment variable is used. |
-| `g:commitgen_base_url` | _(unset)_ | Base URL for an OpenAI-compatible endpoint (e.g. `https://openrouter.ai/api/v1`). When unset, OpenAI's official endpoint is used with the Responses API. |
+| `g:commitgen_base_url` | _(unset)_ | Base URL for an OpenAI-compatible endpoint (e.g. `https://openrouter.ai/api/v1`). When unset, OpenAI's official endpoint is used. |
+
+### How it works
+
+For small diffs (≤ ~48 KB), the full diff is sent inline in a single API request.
+
+For large diffs, a **Map-Reduce** strategy is used:
+1. **Map**: The diff is split into chunks by file boundary (then by lines if needed). Each chunk is summarized individually.
+2. **Reduce**: All summaries are combined and sent to the model to generate the final commit message candidates.
+
+Progress is reported via `:messages` during generation.
 
 ## Usage
 
