@@ -7,11 +7,13 @@ Denops-commitgen.vim is an AI-powered commit message generator for Vim/Neovim
 using Denops and OpenAI models. It helps you generate conventional commit
 messages for your staged Git changes.
 
+Supports any OpenAI-compatible API endpoint, including OpenRouter.
+
 Features:
-- Generate conventional commit messages using AI (OpenAI models, e.g., GPT-4o)
+- Generate conventional commit messages using AI
 - Supports both Vim and Neovim
 - Async and sync interfaces
-- Customizable model and number of suggestions
+- Customizable model, API key, base URL, and number of suggestions
 - Lua interface for Neovim users
 
 ==============================================================================
@@ -47,13 +49,33 @@ Set the model and number of suggestions globally in your vimrc/init.vim:
 
 *g:commitgen_model*
 
-    Specifies the OpenAI model to use for generating commit messages.
-    Default is 'gpt-4o'. You can change it to any other supported model.
+    Specifies the model to use for generating commit messages.
+    Default is 'gpt-4o'. When using OpenRouter, use 'provider/model' format
+    (e.g., 'anthropic/claude-sonnet-4').
 
 *g:commitgen_count*
 
     Specifies the number of commit message suggestions to generate.
     Default is 5. You can adjust this based on your needs.
+
+*g:commitgen_api_key*
+
+    Optional API key for authentication. If unset, the OPENAI_API_KEY
+    environment variable is used.
+
+*g:commitgen_base_url*
+
+    Base URL for an OpenAI-compatible API endpoint. When set, the Chat
+    Completions API is used instead of OpenAI's Responses API, enabling
+    support for providers like OpenRouter.
+    Example: 'https://openrouter.ai/api/v1'
+    Default: unset (uses OpenAI's official endpoint with Responses API)
+
+OPENROUTER EXAMPLE                               *commitgen-openrouter*
+
+    let g:commitgen_base_url = 'https://openrouter.ai/api/v1'
+    let g:commitgen_model = 'anthropic/claude-sonnet-4'
+    let g:commitgen_api_key = 'sk-or-...'
 
 ==============================================================================
 USAGE                                                   *commitgen-usage*
@@ -93,10 +115,14 @@ Lua (Neovim 0.11+):
 ==============================================================================
 CUSTOMIZATION                                           *commitgen-custom*
 
-You can customize the model and number of suggestions using global variables:
+You can customize the behavior using global variables:
 
     let g:commitgen_model = 'gpt-4o'
     let g:commitgen_count = 5
+    let g:commitgen_api_key = 'sk-...'
+    let g:commitgen_base_url = 'https://openrouter.ai/api/v1'
+
+See |commitgen-config| for details.
 
 ==============================================================================
 SEE ALSO                                                *commitgen-seealso*

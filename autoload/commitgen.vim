@@ -5,7 +5,9 @@ function s:create_options(path) abort
 	endif
 	let model = get(g:, 'commitgen_model', 'gpt-4o')
 	let count = get(g:, 'commitgen_count', 5)
-	return [model, projroot, count]
+	let api_key = get(g:, 'commitgen_api_key', v:null)
+	let base_url = get(g:, 'commitgen_base_url', v:null)
+	return [model, projroot, count, api_key, base_url]
 endfunction
 
 function commitgen#get(path) abort

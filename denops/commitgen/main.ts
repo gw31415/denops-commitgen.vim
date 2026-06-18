@@ -7,7 +7,7 @@ import {
 
 export function main(denops: Denops) {
   denops.dispatcher = {
-    commitgen(model, cwd, count, apiKey = null) {
+    commitgen(model, cwd, count, apiKey = null, baseURL = null) {
       if (!isString(model)) {
         throw new Error("model must be a string");
       }
@@ -20,11 +20,15 @@ export function main(denops: Denops) {
       if (apiKey !== null && !isString(apiKey)) {
         throw new Error("apiKey must be a string or null");
       }
+      if (baseURL !== null && !isString(baseURL)) {
+        throw new Error("baseURL must be a string or null");
+      }
       return originCommitgen({
         model: model as any,
         count,
         cwd,
         apiKey: apiKey ?? undefined,
+        baseURL: baseURL ?? undefined,
       });
     },
     getStagedDiff(cwd) {
